@@ -2,8 +2,7 @@ package com.github.OnikenX.Android_calculator
 
 import android.app.Activity
 import android.os.Bundle
-import android.util.Log.wtf
-import android.util.Log.d
+import com.github.OnikenX.Android_calculator.logic.BasicCalculator
 
 import kotlinx.android.synthetic.main.calculator.*
 
@@ -12,154 +11,90 @@ enum class Operator {
 }
 
 class Calculator : Activity() {
-
-
+    var basicCalculator = BasicCalculator()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.calculator)
-
-        val calculator = BasicCalculator()
-
-        calculator.setCallers()
+        setCallers()
     }
 
+    fun updateScr() {
+       screen.text = basicCalculator.getScreen()
+    }
 
-    inner class BasicCalculator {
+    fun addInput(value: Int) {
+        basicCalculator.addInput(value)
+        updateScr()
+    }
 
-        var input = ""
-        var lastNum = 0.0
-        var output = 0.0
-        var actualNum = 0.0
-        var lastOperator = Operator.none;
-        var didOperation = false
-        var resultado = 0.0
-
-        fun reset() {
-            input = ""
-            lastNum = 0.0
-            actualNum = 0.0
-            lastOperator = Operator.none;
-            didOperation = false
-            updateScr()
+    fun setCallersInput() {
+        one.setOnClickListener {
+            addInput(1)
         }
-
-        fun operate(operator: Operator) {
-
-            resultado = when (lastOperator) {
-                Operator.minus -> output - actualNum
-                Operator.plus -> output + actualNum
-                Operator.multiply -> output * actualNum
-                Operator.division -> if (actualNum != 0.0) output / actualNum else output
-                Operator.remainer -> if (actualNum != 0.0) output % actualNum else 0.0
-                Operator.none -> resultado
-            }
-
-
-
-            didOperation = when (lastOperator) {
-                Operator.minus, Operator.plus, Operator.multiply, Operator.division, Operator.remainer -> true
-                else -> false
-            }
-
+        two.setOnClickListener {
+            addInput(2)
         }
-
-        fun actionButton(operator: Operator) {
-            if(operator)
-
-
-
+        tree.setOnClickListener {
+            addInput(3)
         }
-
-        fun showInput() {
-            screen.text = input
+        four.setOnClickListener {
+            addInput(4)
         }
-        fun showOutput(){
-            screen.text = output.toString()
+        five.setOnClickListener {
+            addInput(5)
         }
-
-        fun inputToDouble(): Double {
-            if (input == "")
-                return 0.0
-            return input.toDouble()
+        six.setOnClickListener {
+            addInput(6)
         }
-
-        fun addInput(value : Int){
-            if(value >=0 || value <=9)
-                input += value
-          else
-                if(input.find { c -> c == '.' } != null)
-                    input+= '.'
-            showInput()
+        seven.setOnClickListener {
+            addInput(7)
         }
-
-        fun setCallersInput(){
-
-            one.setOnClickListener {
-                addInput(1)
-            }
-
-            two.setOnClickListener {
-                addInput(2)
-            }
-            tree.setOnClickListener {
-                addInput(3)
-            }
-            four.setOnClickListener {
-                addInput(4)
-            }
-            five.setOnClickListener {
-                addInput(5)
-            }
-
-            six.setOnClickListener {
-                addInput(6)
-            }
-            seven.setOnClickListener {
-                addInput(7)
-            }
-            eight.setOnClickListener {
-                addInput(8)
-            }
-            nine.setOnClickListener {
-                addInput(9)
-            }
-            zero.setOnClickListener {
-                addInput(0)
-            }
-
-            point.setOnClickListener {
-                addInput(10)
-            }
+        eight.setOnClickListener {
+            addInput(8)
         }
-
-        fun setCallersOperators(){
-
-            equal.setOnClickListener {
-                actionButton(Operator.none)
-            }
-            minus.setOnClickListener {
-                actionButton(Operator.minus)
-            }
-            plus.setOnClickListener {
-                actionButton(Operator.plus)
-            }
-            remainer.setOnClickListener {
-                actionButton(Operator.remainer)
-            }
-            multiply.setOnClickListener {
-                actionButton(Operator.multiply)
-            }
-            division.setOnClickListener {
-                actionButton(Operator.division)
-            }
+        nine.setOnClickListener {
+            addInput(9)
         }
-
-        fun setCallers() {
-            AC.setOnClickListener {
-                reset()
-            }
-            setCallersInput()
-            setCallersOperators()
+        zero.setOnClickListener {
+            addInput(0)
+        }
+        point.setOnClickListener {
+            addInput(10)
         }
     }
+
+    fun actionButton(operator: Operator) {
+        basicCalculator.setOperator(operator)
+
+    }
+
+    fun setCallersOperators() {
+        equal.setOnClickListener {
+            actionButton(Operator.none)
+        }
+        minus.setOnClickListener {
+            actionButton(Operator.minus)
+        }
+        plus.setOnClickListener {
+            actionButton(Operator.plus)
+        }
+        remainer.setOnClickListener {
+            actionButton(Operator.remainer)
+        }
+        multiply.setOnClickListener {
+            actionButton(Operator.multiply)
+        }
+        division.setOnClickListener {
+            actionButton(Operator.division)
+        }
+    }
+
+    fun setCallers() {
+        AC.setOnClickListener {
+            basicCalculator.reset()
+        }
+        setCallersInput()
+        setCallersOperators()
+    }
+
 }

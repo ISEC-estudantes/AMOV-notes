@@ -18,15 +18,25 @@ class Calculator : Activity() {
         setCallers()
     }
 
+    //update do screen
     fun updateScr() {
-       screen.text = basicCalculator.getScreen()
+        screen.text = basicCalculator.getScreen()
     }
 
+    //acoes dos botoes
     fun addInput(value: Int) {
         basicCalculator.addInput(value)
         updateScr()
     }
 
+    fun actionButton(operator: Operator) {
+        if (operator == Operator.none)
+            basicCalculator.result()
+        else basicCalculator.setOperator(operator)
+        updateScr()
+    }
+
+    // setup dos constrollers para chamar as funcoes dos buttoes
     fun setCallersInput() {
         one.setOnClickListener {
             addInput(1)
@@ -63,10 +73,6 @@ class Calculator : Activity() {
         }
     }
 
-    fun actionButton(operator: Operator) {
-        basicCalculator.setOperator(operator)
-
-    }
 
     fun setCallersOperators() {
         equal.setOnClickListener {
@@ -92,6 +98,7 @@ class Calculator : Activity() {
     fun setCallers() {
         AC.setOnClickListener {
             basicCalculator.reset()
+            updateScr()
         }
         setCallersInput()
         setCallersOperators()

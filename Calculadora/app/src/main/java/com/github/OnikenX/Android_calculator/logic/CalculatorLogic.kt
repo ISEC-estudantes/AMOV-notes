@@ -3,15 +3,19 @@ package com.github.OnikenX.Android_calculator.logic
 import com.github.OnikenX.Android_calculator.Operator
 
 
-interface IEstado {
+abstract interface IEstado {
     fun addInput(value: Int): IEstado
     fun setOperator(operator: Operator): IEstado
     fun reset(): IEstado
+    fun result(): IEstado
 }
 
-open class CalculatorLogic(calculatorData: CalculatorData) : IEstado {
+abstract open class CalculatorLogic(calculatorData: CalculatorData) : IEstado {
 
     var calculatorData: CalculatorData = calculatorData
+    override fun result(): IEstado {
+        return this
+    }
 
     override fun addInput(value: Int): IEstado {
         calculatorData.addIntToInput(value)
@@ -24,7 +28,7 @@ open class CalculatorLogic(calculatorData: CalculatorData) : IEstado {
 
     override fun reset(): IEstado {
         calculatorData.reset()
-        return Novo(calculatorData, true)
+        return CalculoParteUm(calculatorData)
     }
 }
 
@@ -32,54 +36,66 @@ open class CalculatorLogic(calculatorData: CalculatorData) : IEstado {
 //argumentos:
 //  os argumentos de defalt esperam que este esteja a ser carregado pela primeira vez
 //  meter se o int to add o construtor vai ignorar tudo o resto excepto a calculator
-class Novo(
+class CalculoParteUm(
     calculatorData: CalculatorData,
-    inFirstValue: Boolean = true,
-    operator: Operator = Operator.none,
     intToAdd: Int = -1
 ) : CalculatorLogic(calculatorData) {
     init {
-        calculatorData.novoEstado(inFirstValue, operator, intToAdd)
+        calculatorData.reset()
+        if (intToAdd != -1) {
+            calculatorData.addIntToInput(intToAdd)
+        }
     }
 
     override fun setOperator(operator: Operator): IEstado {
-        if (calculatorData.inFirstValue)
-            if (!calculatorData.input.isEmpty())
-                if (operator != Operator.none) {
-                    calculatorData.value1 = calculatorData.input.toDouble()
-                    calculatorData.input = ""
-                    calculatorData.operator = operator
-                    calculatorData.inFirstValue = false
-                } else if (!calculatorData.input.isEmpty()) {
-                    calculatorData.value2 = calculatorData.input.toDouble()
-                    calculatorData.input = ""
-                    if (operator != Operator.none) {
-                        calculatorData.value2 = calculatorData.input.toDouble()
-                        calculatorData.input = ""
-                        return Novo(calculatorData, false, operator)
-                    } else {
-                        return Resultado(calculatorData)
-                    }
-                }
+        if (!calculatorData.input.isEmpty()) {
+            calculatorData.value1 = calculatorData.input.toDouble()
+            return CalculoParteDois(calculatorData, operator)
+        }
         return this
     }
 }
 
-class Resultado(calculatorData: CalculatorData) : CalculatorLogic(calculatorData) {
+class CalculoParteDois(calculatorData: CalculatorData, operator: Operator) : CalculatorLogic(calculatorData) {
     init {
-        calculatorData.resultadoMode()
+        calculatorData.input = ""
+        calculatorData.operator = operator
     }
 
     override fun setOperator(operator: Operator): IEstado {
-        if (operator == Operator.none) {
+        if (!calculatorData.input.isEmpty()) {
+            calculatorData.value2 = calculatorData.input.toDouble()
             calculatorData.fazConta()
-            return this
-        } else
-            return Novo(calculatorData, false, operator)
+            return CalculoParteDois(calculatorData, operator)
+        }
+        return this
+    }
+
+    override fun result(): IEstado {
+        if (!calculatorData.input.isEmpty()) {
+            calculatorData.value2 = calculatorData.input.toDouble()
+            calculatorData.input = ""
+            return Resultado(calculatorData)
+        }
+        return this
+    }
+
+}
+
+class Resultado(calculatorData: CalculatorData) : CalculatorLogic(calculatorData) {
+    init {
+        calculatorData.fazConta()
+    }
+
+    override fun result(): IEstado {
+        return Resultado(calculatorData)
+    }
+    override fun setOperator(operator: Operator): IEstado {
+            return CalculoParteDois(calculatorData, operator)
     }
 
     override fun addInput(value: Int): IEstado {
-        return Novo(calculatorData, false, Operator.none, value);
+        return CalculoParteUm(calculatorData, value)
     }
 
 

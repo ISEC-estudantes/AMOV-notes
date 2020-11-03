@@ -13,6 +13,7 @@ class Principal : Activity(),View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView (R.layout.principal)
 
+
         tvTexto1 = findViewById(R.id.tvTexto1)
         tvTexto1.text = "2020.10.20"
         val btn1 : Button = findViewById(R.id.btn1)

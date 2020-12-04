@@ -8,12 +8,17 @@ abstract interface IEstado {
     fun setOperator(operator: Operator): IEstado
     fun reset(): IEstado
     fun result(): IEstado
+    fun negate(): IEstado
 }
 
-abstract open class CalculatorLogic(calculatorData: CalculatorData) : IEstado {
+abstract class CalculatorLogic(calculatorData: CalculatorData) : IEstado {
 
     var calculatorData: CalculatorData = calculatorData
     override fun result(): IEstado {
+        return this
+    }
+
+    override fun negate(): IEstado {
         return this
     }
 
@@ -49,31 +54,49 @@ class CalculoParteUm(
 
     override fun setOperator(operator: Operator): IEstado {
         if (!calculatorData.input.isEmpty()) {
-            calculatorData.value1 = calculatorData.input.toDouble()
+            if (calculatorData.input == "-")
+                return this
+            calculatorData.value1 = calculatorData.inputToDouble()
             return CalculoParteDois(calculatorData, operator)
         }
+        if (operator == Operator.minus)
+            negate()
+        return this
+    }
+
+    override fun negate(): IEstado {
+        calculatorData.negateInput()
         return this
     }
 }
 
-class CalculoParteDois(calculatorData: CalculatorData, operator: Operator) : CalculatorLogic(calculatorData) {
+class CalculoParteDois(calculatorData: CalculatorData, operator: Operator) :
+    CalculatorLogic(calculatorData) {
     init {
         calculatorData.input = ""
         calculatorData.operator = operator
     }
+    override fun negate(): IEstado {
+        calculatorData.negateInput()
+        return this
+    }
 
     override fun setOperator(operator: Operator): IEstado {
         if (!calculatorData.input.isEmpty()) {
-            calculatorData.value2 = calculatorData.input.toDouble()
+            if (calculatorData.input == "-")
+                return this
+            calculatorData.value2 = calculatorData.inputToDouble()
             calculatorData.fazConta()
             return CalculoParteDois(calculatorData, operator)
         }
+        if (operator == Operator.minus)
+            calculatorData.input+='-'
         return this
     }
 
     override fun result(): IEstado {
         if (!calculatorData.input.isEmpty()) {
-            calculatorData.value2 = calculatorData.input.toDouble()
+            calculatorData.value2 = calculatorData.inputToDouble()
             calculatorData.input = ""
             return Resultado(calculatorData)
         }
@@ -90,8 +113,14 @@ class Resultado(calculatorData: CalculatorData) : CalculatorLogic(calculatorData
     override fun result(): IEstado {
         return Resultado(calculatorData)
     }
+
     override fun setOperator(operator: Operator): IEstado {
-            return CalculoParteDois(calculatorData, operator)
+        return CalculoParteDois(calculatorData, operator)
+    }
+
+    override fun negate(): IEstado {
+        calculatorData.value1 = -calculatorData.value1
+        return this
     }
 
     override fun addInput(value: Int): IEstado {

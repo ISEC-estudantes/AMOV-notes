@@ -28,6 +28,8 @@ class CalculatorData() {
     fun inputToDouble(): Double {
         return if (input.isEmpty())
             0.0
+        else if (input == "-")
+            -1.0
         else
             input.toDouble()
     }
@@ -42,12 +44,19 @@ class CalculatorData() {
             Operator.none -> throw IllegalArgumentException("Can not do an aritmetic operation without operator")
         }
     }
-
+    
+    fun negateInput(){
+        input = if (input.find{ c -> c == '-' } != null)
+            input.filter{ c -> c == '-'}
+        else "-${input}"
+    }
+    
     fun reset() {
         input = ""
         value2 = 0.0
         value1 = 0.0
         operator = Operator.none
+
     }
 
 

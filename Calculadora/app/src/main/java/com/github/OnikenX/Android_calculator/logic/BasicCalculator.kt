@@ -25,7 +25,11 @@ class BasicCalculator() {
         estado = estado.result()
     }
 
-    fun getScreen() :String{
+    fun negate(){
+        estado = estado.negate()
+    }
+
+    fun getScreen(): String {
         return when (estado) {
             is CalculoParteUm -> calculatorData.input
             is CalculoParteDois -> {

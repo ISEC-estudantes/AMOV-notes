@@ -30,9 +30,7 @@ class Calculator : Activity() {
     }
 
     fun actionButton(operator: Operator) {
-        if (operator == Operator.none)
-            basicCalculator.result()
-        else basicCalculator.setOperator(operator)
+        basicCalculator.setOperator(operator)
         updateScr()
     }
 
@@ -76,7 +74,8 @@ class Calculator : Activity() {
 
     fun setCallersOperators() {
         equal.setOnClickListener {
-            actionButton(Operator.none)
+            basicCalculator.result()
+            updateScr()
         }
         minus.setOnClickListener {
             actionButton(Operator.minus)
@@ -92,6 +91,10 @@ class Calculator : Activity() {
         }
         division.setOnClickListener {
             actionButton(Operator.division)
+        }
+        negate.setOnClickListener {
+            basicCalculator.negate()
+            updateScr()
         }
     }
 
